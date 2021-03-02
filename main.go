@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"unicode"
@@ -87,6 +88,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 
 	t, err := template.New("index").Parse(index_html)
 
+	order := r.URL.Query().Get("order")
 	q := r.URL.Query().Get("q")
 	data.Query = q
 
@@ -110,6 +112,18 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		if hasAllKeys {
 			searchResult = append(searchResult, fileMeta)
 		}
+	}
+
+	if order == "mtime" {
+		sort.Sort(ByModTime(searchResult))
+	}
+
+	if order == "name" {
+		sort.Sort(ByName(searchResult))
+	}
+
+	if order == "size" {
+		sort.Sort(BySize(searchResult))
 	}
 
 	data.NumFiles = len(searchResult)

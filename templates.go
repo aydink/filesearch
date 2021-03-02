@@ -48,7 +48,7 @@ var index_html = `
 	{{end}}
 
     {{range .Result}}    
-        <a href="/open?file={{.Path}}">{{.FileName}}</a><br/>    
+        {{.ModTime}} <a href="/open?file={{.Path}}">{{.FileName}}</a><br/>    
     {{end}}
 
 </body>
