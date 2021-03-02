@@ -132,7 +132,14 @@ func main() {
 	flag.Parse()
 	// 1st argument is the directory location
 	arg1 := flag.Arg(0)
+	if len(arg1) < 1 {
+		fmt.Println("Arama yapmak istediğiniz klasörü girin")
+		fmt.Println("Örnek kullanım: filesearch.exe d:\\dosyalar")
+		return
+	}
+
 	fmt.Println("Klasör:", arg1)
+	fmt.Println("Aranacak klasörü indeksliyorum, lütfen bekleyin")
 
 	destinationPath, err := filepath.Abs(arg1)
 	if err != nil {
@@ -151,7 +158,7 @@ func main() {
 		}
 	} else if os.IsNotExist(err) {
 		// path/to/whatever does *not* exist
-		fmt.Println("Dosya listesi oluşturuluyor, lütfen bekleyin")
+		fmt.Println("Dosya listesi oluşturuluyor")
 		destinationMeta, err = createFolderMeta(destinationPath)
 		if err != nil {
 			fmt.Println(err)
@@ -159,7 +166,6 @@ func main() {
 		}
 
 		saveFolderMeta(destinationMeta, destinationPath+string(os.PathSeparator)+"folderMeta.txt")
-		fmt.Println("Tamamlandı")
 	} else {
 		// Schrodinger: file may or may not exist. See err for details.
 		fmt.Println(err)
@@ -167,8 +173,9 @@ func main() {
 	}
 
 	//fmt.Print(destinationMeta)
-
 	//--------------------------
+	fmt.Println("Tamamlandı")
+	fmt.Println("Uygulamaya erişmek için web tarayıcınız ile http://localhost:8080 adresine gidin")
 
 	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/search/", searchHandler)

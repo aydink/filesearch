@@ -5,7 +5,7 @@ var index_html = `
 <html lang="en">
 
 <head>
-    <title>Resmi Yayınlar</title>
+    <title>Basit dosya arama motoru</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -29,7 +29,7 @@ var index_html = `
 <body>
     <div class="container">
         <nav class="navbar fixed-top navbar-light bg-light py-2">
-            <a><b>Resmi yayınlar</b></a>            
+            <a><b>Dosyaları bulmak için anahtar kelimeler girin</b></a>            
         </nav>
     </div>
 
