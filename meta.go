@@ -209,3 +209,21 @@ func createMap(fileMeta []FileMeta) map[string]FileMeta {
 
 	return metaMap
 }
+
+type ByModTime []FileMeta
+
+func (a ByModTime) Len() int           { return len(a) }
+func (a ByModTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByModTime) Less(i, j int) bool { return a[i].ModTime > a[j].ModTime }
+
+type ByName []FileMeta
+
+func (a ByName) Len() int           { return len(a) }
+func (a ByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByName) Less(i, j int) bool { return a[i].FileName < a[j].FileName }
+
+type BySize []FileMeta
+
+func (a BySize) Len() int           { return len(a) }
+func (a BySize) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a BySize) Less(i, j int) bool { return a[i].Size < a[j].Size }
