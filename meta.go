@@ -226,4 +226,4 @@ type BySize []FileMeta
 
 func (a BySize) Len() int           { return len(a) }
 func (a BySize) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a BySize) Less(i, j int) bool { return a[i].Size < a[j].Size }
+func (a BySize) Less(i, j int) bool { return a[i].Size > a[j].Size }

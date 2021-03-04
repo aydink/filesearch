@@ -1,5 +1,12 @@
 package main
 
+import (
+	"fmt"
+	"html/template"
+	"os"
+	"time"
+)
+
 var index_html = `
 <!doctype html>
 <html lang="en">
@@ -18,6 +25,10 @@ var index_html = `
         .search-button {
             font-size: 1.5em;            
         }
+        .table { display:table; border-spacing: 5px; border-collapse:separate;  }
+        .row { display: table-row }
+        .cell { display: table-cell; margin-left: 15px; }
+
     </style>
    <script>
        document.addEventListener("DOMContentLoaded", function(event) {
@@ -44,13 +55,69 @@ var index_html = `
 	{{if .NumFiles}}
 		<b>{{ $.NumFiles}}</b> dosya bulundu
 		{{if $.Truncated}}, yalnızca ilk 2000 sonuç gösterilmiştir.{{end}}
-		<br/>
+		<br/><br/>
 	{{end}}
 
-    {{range .Result}}    
-        {{.ModTime}} <a href="/open?file={{.Path}}">{{.FileName}}</a><br/>    
+
+    {{if .Result}}
+        <a href="/search?q={{- $.Query -}}&order=mtime">Tarihe göre sırala</a> | <a href="/search?q={{- $.Query -}}&order=size">Boyuta göre sırala</a> | <a href="/search?q={{- $.Query -}}&order=name">Ada göre sırala</a><br>
     {{end}}
+
+    <div class="table">
+
+    {{if .Result}}        
+        <div class="row">
+            <div class="cell"><b>Tarih</b></div>            
+            <div class="cell"><b>Dosya Adı</b></div>
+            <div class="cell"><b>Boyut</b></div>
+        </div>
+    {{end}}
+
+    {{range .Result}}
+        <div class="row">
+            <div class="cell"> {{printModTime .ModTime}} </div>            
+            <div class="cell"> <a href="/open?file={{.Path}}">{{.FileName}}</a></div>
+            <div class="cell"> {{fileSize .Size}}</div>
+        </div>    
+    {{end}}
+    </div>
 
 </body>
 </html>
 `
+var funcMap template.FuncMap
+var tpl *template.Template
+var err error
+
+func printModTime(modTime int64) string {
+	return time.Unix(modTime, 0).Format("2006-01-02 15:04:05")
+}
+
+func ByteCountSI(b int64) string {
+	const unit = 1000
+	if b < unit {
+		return fmt.Sprintf("%d B", b)
+	}
+	div, exp := int64(unit), 0
+	for n := b / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %cB",
+		float64(b)/float64(div), "kMGTPE"[exp])
+}
+
+func init() {
+
+	funcMap = template.FuncMap{
+		"printModTime": printModTime,
+		"fileSize":     ByteCountSI,
+	}
+
+	tpl, err = template.New("index").Funcs(funcMap).Parse(index_html)
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(3)
+	}
+}
