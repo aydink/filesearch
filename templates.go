@@ -55,21 +55,16 @@ var index_html = `
 	{{if .NumFiles}}
 		<b>{{ $.NumFiles}}</b> dosya bulundu
 		{{if $.Truncated}}, yalnızca ilk 2000 sonuç gösterilmiştir.{{end}}
-		<br/><br/>
+		<br/>
 	{{end}}
-
-
-    {{if .Result}}
-        <a href="/search?q={{- $.Query -}}&order=mtime">Tarihe göre sırala</a> | <a href="/search?q={{- $.Query -}}&order=size">Boyuta göre sırala</a> | <a href="/search?q={{- $.Query -}}&order=name">Ada göre sırala</a><br>
-    {{end}}
 
     <div class="table">
 
     {{if .Result}}        
         <div class="row">
-            <div class="cell"><b>Tarih</b></div>            
-            <div class="cell"><b>Dosya Adı</b></div>
-            <div class="cell"><b>Boyut</b></div>
+            <div class="cell"><b><a href="/search?q={{- $.Query -}}&order=mtime">Tarih</a></b></div>            
+            <div class="cell"><b><a href="/search?q={{- $.Query -}}&order=name">Dosya Adı</a></b></div>
+            <div class="cell"><b><a href="/search?q={{- $.Query -}}&order=size">Boyut</a></b></div>
         </div>
     {{end}}
 

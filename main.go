@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 type TemplateData struct {
@@ -45,22 +46,36 @@ func main() {
 	flag.Parse()
 	// 1st argument is the directory location
 	arg1 := flag.Arg(0)
-	if len(arg1) < 1 {
-		fmt.Println("Arama yapmak istediğiniz klasörü girin")
-		fmt.Println("Örnek kullanım: filesearch.exe d:\\dosyalar")
-		return
+
+	if len(os.Args) == 1 {
+		arg1 = "."
 	}
 
-	fmt.Println("Klasör:", arg1)
-	fmt.Println("Aranacak klasörü indeksliyorum, lütfen bekleyin")
+	/*
+		if len(arg1) < 1 {
+			fmt.Println("Arama yapmak istediğiniz klasörü girin")
+			fmt.Println("Örnek kullanım: filesearch.exe d:\\dosyalar")
+			return
+		}
+	*/
 
 	destinationPath, err := filepath.Abs(arg1)
 	if err != nil {
-		fmt.Println("Klasör geçersiz")
+		fmt.Println(destinationPath, "klasörü geçersiz")
 		return
 	}
 
+	if _, err := os.Stat(destinationPath); os.IsNotExist(err) {
+		fmt.Println(destinationPath, "böyle bir klasör mevcut değil")
+		return
+	}
+
+	fmt.Println("Klasör:", destinationPath)
+	fmt.Println("Aranacak klasörü indeksliyorum, lütfen bekleyin")
+
 	//var destinationMeta []FileMeta
+
+	var metaFileNeedsUpdate bool = false
 
 	if _, err := os.Stat(destinationPath + string(os.PathSeparator) + "folderMeta.txt"); err == nil {
 		// path/to/whatever exists
@@ -69,8 +84,25 @@ func main() {
 			fmt.Println(err)
 			return
 		}
+
+		if strings.HasPrefix(destinationMeta[0].Path, destinationPath) {
+			fmt.Println("dosya listesi daha önce oluşturulmuş, aynı liste kullanılacak")
+		} else {
+			fmt.Println("fileMeta.txt dosyası geçerli değil yeniden oluşturulacak")
+			metaFileNeedsUpdate = true
+		}
+
 	} else if os.IsNotExist(err) {
 		// path/to/whatever does *not* exist
+		metaFileNeedsUpdate = true
+	} else {
+		// file may or may not exist. See err for details.
+		fmt.Println(err)
+		return
+	}
+
+	// either fileMeta.txt does not exist or needs update
+	if metaFileNeedsUpdate {
 		fmt.Println("Dosya listesi oluşturuluyor")
 		destinationMeta, err = createFolderMeta(destinationPath)
 		if err != nil {
@@ -79,10 +111,6 @@ func main() {
 		}
 
 		saveFolderMeta(destinationMeta, destinationPath+string(os.PathSeparator)+"folderMeta.txt")
-	} else {
-		// Schrodinger: file may or may not exist. See err for details.
-		fmt.Println(err)
-		return
 	}
 
 	//fmt.Print(destinationMeta)

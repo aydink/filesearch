@@ -71,13 +71,12 @@ func loadFolderMeta(filePath string) ([]FileMeta, error) {
 
 	// read data from CSV file
 	csvFile, err := os.Open(filePath)
+	defer csvFile.Close()
 
 	if err != nil {
 		fmt.Println(err)
 		return folderMeta, err
 	}
-
-	defer csvFile.Close()
 
 	reader := csv.NewReader(csvFile)
 	// Use tab-delimited instead of comma
